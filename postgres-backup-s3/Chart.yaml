@@ -1,0 +1,7 @@
+apiVersion: v2
+name: postgres-backup-s3
+description: A Helm chart backing up Postgres DBs to S3
+
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

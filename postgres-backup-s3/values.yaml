@@ -1,0 +1,94 @@
+# Default values for postgres-backup-s3.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: eeshugerman/postgres-backup-s3
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "15"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+restartPolicy: "OnFailure"
+schedule: "0 9 * * *"
+env:
+  - name: BACKUP_KEEP_DAYS
+    value: "30"
+  - name: S3_REGION
+    value: us-west-1
+  - name: S3_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: postgres-backup-s3
+        key: s3-access-key-id
+  - name: S3_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: postgres-backup-s3
+        key: s3-secret-access-key
+  - name: S3_BUCKET
+    value: my-bucket
+  - name: S3_PREFIX
+    value: backup
+  - name: POSTGRES_HOST
+    value: postgres
+  - name: POSTGRES_DATABASE
+    value: dbname
+  - name: POSTGRES_USER
+    value: user
+  - name: POSTGRES_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: postgres-backup-s3
+        key: postgres-password
+  - name: S3_ENDPOINT
+    value: foo
+command:
+  - sh
+args:
+  - backup.sh
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
